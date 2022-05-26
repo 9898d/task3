@@ -30,48 +30,16 @@ import kotlin.concurrent.timer
 import kotlin.system.exitProcess
 
 
-private var color by mutableStateOf(Color.White)
-
-private val list = listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
-
-private var snake = Snake()
-
-private var lengthOfSnake = snake.length
-
-private var bodyOfSnake = snake.bodyOfSnake
-
-private var listOfSnake by mutableStateOf(bodyOfSnake)
-
-val playingField = PlayingField()
-
-val height = playingField.height
-
-val width = playingField.width
-
-var apple = Apple()
-
-val walls = Walls().newWalls()
-
-var speed: Long by mutableStateOf(250)
-
-var condition = ""
-
-var timer = timer(daemon = true, period = 250) {}
-
 @Composable
 @Preview
 fun App() {
-    var appleY = apple.appleY
-    var appleX = apple.appleX
-    var stop = 0
     MaterialTheme {
         Column {
             for (j in 1..height) {
                 Row {
                     for (i in 1..width) {
                         when {
-
-                            (listOfSnake.first() == Pair(i, j)) -> {
+                            (snake.bodyOfSnake.first() == Pair(i, j)) -> {
                                 Box(
                                     modifier = Modifier.size(40.dp, 40.dp).background(Color.Black, CircleShape),
                                     contentAlignment = Alignment.Center
@@ -84,9 +52,10 @@ fun App() {
                                 Box(
                                     modifier = Modifier.size(40.dp, 40.dp).background(Color.Gray)
                                 )
-                            }*/
+                            }
+                            */
 
-                            (listOfSnake.contains(Pair(i, j))) -> {
+                            (snake.bodyOfSnake.contains(Pair(i, j))) -> {
                                 Box(
                                     modifier = Modifier.size(40.dp, 40.dp).background(Color.Black, CircleShape),
                                     contentAlignment = Alignment.Center
@@ -95,36 +64,28 @@ fun App() {
                                 }
                             }
 
-                            (i == appleX) && (j == appleY) -> {
+                            (i == apple.appleX) && (j == apple.appleY) -> {
                                 Box(modifier = Modifier.size(40.dp, 40.dp).background(Color.White)) {
                                     val img = painterResource("Drawable/apple.png")
                                     Image(painter = img, "icon")
                                 }
                             }
 
-                            (listOfSnake.first().first == appleX && listOfSnake.first().second == appleY) -> {
-                                listOfSnake = listOfSnake + listOfSnake.map { Pair(it.first, it.second) }.last()
-                                println(listOfSnake)
-                                stop++
+                            (snake.bodyOfSnake.first().first == apple.appleX && snake.bodyOfSnake.first().second == apple.appleY) -> {
+                                snake.bodyOfSnake = snake.bodyOfSnake + snake.bodyOfSnake.map { Pair(it.first, it.second) }.last()
                                 apple = Apple()
-                                appleX = apple.appleX
-                                appleY = apple.appleY
                             }
 
-                            (stop != 0) -> {
-                                stop = 0
-                            }
-
-                            else -> Box(modifier = Modifier.size(40.dp, 40.dp).background(color)) {}
+                            else -> Box(modifier = Modifier.size(40.dp, 40.dp).background(Color.White)) {}
                         }
                     }
                 }
             }
         }
-        if (!list.contains(listOfSnake.first().first) || !list.contains(listOfSnake.first().second)) {
+        if (!list.contains(snake.bodyOfSnake.first().first) || !list.contains(snake.bodyOfSnake.first().second)) {
             condition = "игра окончена"
         }
-        if (listOfSnake.size == height * width) {
+        if (snake.bodyOfSnake.size == height * width) {
             Button(onClick = { }, modifier = Modifier.fillMaxSize()) {
                 Text("WIN")
             }
@@ -135,76 +96,35 @@ fun App() {
 
 @ExperimentalComposeUiApi
 fun main() = application {
-    var move = ""
         timer(
-        daemon = true, period = speed
+        daemon = true, period = speed,
     ) {
         when (move) {
-            "вверх" -> {
-                val head = listOfSnake.first()
-                listOfSnake =
-                    listOf(Pair(head.first, head.second - 1)) + listOfSnake.subList(0, listOfSnake.size - 1)
-            }
-            "вниз" -> {
-                val head = listOfSnake.first()
-                listOfSnake =
-                    listOf(Pair(head.first, head.second + 1)) + listOfSnake.subList(0, listOfSnake.size - 1)
-            }
-            "вправо" -> {
-                val head = listOfSnake.first()
-                listOfSnake =
-                    listOf(Pair(head.first + 1, head.second)) + listOfSnake.subList(0, listOfSnake.size - 1)
-            }
-            "влево" -> {
-                val head = listOfSnake.first()
-                listOfSnake =
-                    listOf(Pair(head.first - 1, head.second)) + listOfSnake.subList(0, listOfSnake.size - 1)
-            }
-            "пауза" -> {
-
-            }
+            "вверх" -> { snake.up() }
+            "вниз" -> { snake.down() }
+            "вправо" -> { snake.right() }
+            "влево" -> { snake.left() }
+            "пауза" -> {  }
         }
             when (condition) {
-                "ускорение" -> {
-                    speed = 1000
-                }
                 "игра окончена" -> {
                     exitApplication()
-                    println("Игра окончена. Ваш счёт: ${listOfSnake.size}")
+                    println("Игра окончена. Ваш счёт: ${snake.bodyOfSnake.size}")
                 }
             }
     }
     Window(
         onKeyEvent = {
-            if (it.type == KeyEventType.KeyUp) {
-                when (it.key) {
-                    Key.DirectionDown -> {
-                        move = "вниз"
-                    }
-                    Key.DirectionUp -> {
-                        move = "вверх"
-                    }
-                    Key.DirectionRight -> {
-                        move = "вправо"
-                    }
-                    Key.DirectionLeft -> {
-                        move = "влево"
-                    }
-                    Key.Spacebar -> {
-                        move = "пауза"
-                    }
-                    Key.A -> {
-                        speed = 1000
-                        println(speed)
-                        condition = "ускорение"
-                    }
-                }
-            }
+            keyEvent(it)
             false
-        }, onCloseRequest = ::exitApplication, title = "Змейка", state = rememberWindowState(
+        },
+        onCloseRequest = ::exitApplication,
+        title = "Змейка",
+        state = rememberWindowState(
             position = WindowPosition.Aligned(
                 Alignment.Center
-            ), width = 654.dp, height = 675.dp
+            ),
+            width = 654.dp, height = 675.dp
         )
     ) {
         App()

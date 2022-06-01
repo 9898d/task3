@@ -19,6 +19,8 @@ var lemon = Fruit(name = "lemon")
 
 var grape = Fruit(Pair(100, 100))
 
+var shield = Fruit(name = "shield")
+
 var watermelon = Fruit(name = "watermelon")
 
 var speed: Long = 250
@@ -29,7 +31,11 @@ var move = ""
 
 var headColor = Color.White
 
+var lastColor = Color.White
+
 var rotate = 90f
+
+var isShield = true
 
 val timerFast = timer(
     daemon = true, period = speed / 2
@@ -93,4 +99,5 @@ fun restart() {
     apple = Fruit()
     lemon = Fruit(name = "lemon")
     watermelon = Fruit(name = "watermelon")
+    headColor = Color.White
 }

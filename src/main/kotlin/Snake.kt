@@ -29,7 +29,6 @@ class Snake(private val xOfHead: Int = 1, private val yOfHead: Int = 1) {
     fun isSnakeSmash(): Boolean {
         return bodyOfSnake.first().first !in range ||
                 bodyOfSnake.first().second !in range ||
-                walls.contains(bodyOfSnake.first()) ||
                 (bodyOfSnake.size > 3 && bodyOfSnake.subList(3, bodyOfSnake.size).contains(bodyOfSnake.first()))
     }
 }

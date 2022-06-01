@@ -70,6 +70,12 @@ fun app() {
                                     }
                                 }
 
+                                (shield.coordinates == Pair(i, j)) -> {
+                                    Box(modifier = Modifier.size(40.dp, 40.dp)) {
+                                        Image(painter = painterResource("Drawable/shield.png"), "icon")
+                                    }
+                                }
+
                                 (snake.bodyOfSnake.first() == apple.coordinates) -> {
                                     snake.bodyOfSnake =
                                         snake.bodyOfSnake + snake.bodyOfSnake.map { Pair(it.first, it.second) }.last()
@@ -101,9 +107,44 @@ fun app() {
                                     condition = "медленно"
                                 }
 
+                                (snake.bodyOfSnake.first() == shield.coordinates) -> {
+                                    shield = Fruit(name = "shield")
+                                    isShield = false
+                                    if (headColor != Color.Blue) {
+                                        lastColor = headColor
+                                        headColor = Color.Blue
+                                    }
+                                }
+
                                 else -> Box(modifier = Modifier.size(40.dp, 40.dp))
                             }
                         }
+                    }
+                }
+            }
+        }
+        if (walls.contains(snake.bodyOfSnake.first())) {
+            if (!isShield) {
+                isShield = true
+                headColor = lastColor
+            } else {
+                condition = "игра окончена"
+                Button(
+                    onClick = { restart() },
+                    modifier = Modifier.fillMaxSize(),
+                    colors = ButtonDefaults.buttonColors(backgroundColor = Color(116, 189, 37), contentColor = Color.Black)
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Row(modifier = Modifier.weight(1f)) {}
+                        Row(modifier = Modifier.weight(2f)) { Text("LOSE", fontSize = 100.sp) }
+                        Row(modifier = Modifier.weight(2f)) {
+                            Text(
+                                "Your score: ${snake.bodyOfSnake.size}",
+                                fontSize = 50.sp
+                            )
+                        }
+                        Row(modifier = Modifier.weight(1f)) { Text("Click to try again", fontSize = 25.sp) }
+                        Row(modifier = Modifier.weight(1f)) {}
                     }
                 }
             }

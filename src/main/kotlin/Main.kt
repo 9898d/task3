@@ -16,7 +16,9 @@ fun main() = application {
     ) {
         when (condition) {
             "норм" -> {
-                headColor = Color.White
+                if (headColor != Color.Blue) {
+                    headColor = Color.White
+                }
                 when (move) {
                     "вверх" -> {
                         snake.up()
@@ -34,11 +36,15 @@ fun main() = application {
                 }
             }
             "быстро" -> {
-                headColor = Color.Yellow
+                if (headColor != Color.Blue) {
+                    headColor = Color.Yellow
+                }
                 timerFast
             }
             "медленно" -> {
-                headColor = Color(255, 0, 255)
+                if (headColor != Color.Blue) {
+                    headColor = Color(255, 0, 255)
+                }
                 timerSlow
             }
             "игра окончена" -> {

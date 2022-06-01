@@ -1,6 +1,6 @@
 class PlayingField(val width: Int = 16, val height: Int = 16) {
 
-    fun allCells(): MutableList<Pair<Int, Int>> {
+    private fun allCells(): MutableList<Pair<Int, Int>> {
         val a = mutableListOf<Pair<Int, Int>>()
         for (i in 1..width) {
             for (j in 1..height) {
@@ -10,6 +10,6 @@ class PlayingField(val width: Int = 16, val height: Int = 16) {
         return a
     }
 
-    private val listOfCells = allCells()
+    val listOfCells = allCells()
 
 }

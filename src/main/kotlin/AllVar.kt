@@ -1,19 +1,96 @@
-val list = listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
-
-var snake = Snake()
+import androidx.compose.ui.graphics.Color
+import kotlin.concurrent.timer
 
 val playingField = PlayingField()
 
-val height = playingField.height
+var snake = Snake()
 
-val width = playingField.width
+var freeCells = playingField.listOfCells
 
-var apple = Apple()
+var freeCellsForFruit: List<Pair<Int, Int>> = freeCells
 
-val walls = Walls().newWalls()
+val range = 1..playingField.height
+
+var walls = Walls().newWalls()
+
+var apple = Fruit()
+
+var lemon = Fruit(name = "lemon")
+
+var grape = Fruit(Pair(100, 100))
+
+var watermelon = Fruit(name = "watermelon")
 
 var speed: Long = 250
 
-var condition = ""
+var condition = "норм"
 
 var move = ""
+
+var headColor = Color.White
+
+var rotate = 90f
+
+val timerFast = timer(
+    daemon = true, period = speed / 2
+) {
+    when (condition) {
+        "быстро" -> {
+            when (move) {
+                "вверх" -> {
+                    snake.up()
+                }
+                "вниз" -> {
+                    snake.down()
+                }
+                "вправо" -> {
+                    snake.right()
+                }
+                "влево" -> {
+                    snake.left()
+                }
+                "пауза" -> {}
+            }
+        }
+    }
+}
+
+val timerSlow = timer(
+    daemon = true, period = speed * 2
+) {
+    when (condition) {
+        "медленно" -> {
+            when (move) {
+                "вверх" -> {
+                    snake.up()
+                }
+                "вниз" -> {
+                    snake.down()
+                }
+                "вправо" -> {
+                    snake.right()
+                }
+                "влево" -> {
+                    snake.left()
+                }
+                "пауза" -> {}
+            }
+        }
+    }
+}
+
+fun restartWithCurrentField() {
+    snake.bodyOfSnake = listOf(Pair(1, 1))
+    condition = "норм"
+    move = ""
+}
+
+fun restart() {
+    snake.bodyOfSnake = listOf(Pair(1, 1))
+    condition = "норм"
+    move = ""
+    walls = Walls().newWalls()
+    apple = Fruit()
+    lemon = Fruit(name = "lemon")
+    watermelon = Fruit(name = "watermelon")
+}

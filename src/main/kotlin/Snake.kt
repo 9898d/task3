@@ -2,7 +2,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 
-class Snake(var length: Int = 1, private val xOfHead: Int = 1, private val yOfHead: Int = 1) {
+class Snake(private val xOfHead: Int = 1, private val yOfHead: Int = 1) {
 
      var bodyOfSnake: List<Pair<Int, Int>> by mutableStateOf(listOf(Pair(xOfHead, yOfHead)))
 
@@ -24,5 +24,12 @@ class Snake(var length: Int = 1, private val xOfHead: Int = 1, private val yOfHe
     fun left() {
         val head = bodyOfSnake.first()
         bodyOfSnake = listOf(Pair(head.first - 1, head.second)) + bodyOfSnake.subList(0, bodyOfSnake.size - 1)
+    }
+
+    fun isSnakeSmash(): Boolean {
+        return bodyOfSnake.first().first !in range ||
+                bodyOfSnake.first().second !in range ||
+                walls.contains(bodyOfSnake.first()) ||
+                (bodyOfSnake.size > 3 && bodyOfSnake.subList(3, bodyOfSnake.size).contains(bodyOfSnake.first()))
     }
 }

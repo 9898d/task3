@@ -13,79 +13,130 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Canvas
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.toComposeImageBitmap
-import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.KeyEventType
-import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.type
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.rememberWindowState
-import java.io.File
 import kotlin.concurrent.timer
-import kotlin.system.exitProcess
 
 
 @Composable
 @Preview
-fun App() {
+fun app() {
     MaterialTheme {
-        Column {
-            for (j in 1..height) {
-                Row {
-                    for (i in 1..width) {
-                        when {
-                            (snake.bodyOfSnake.first() == Pair(i, j)) -> {
-                                Box(
-                                    modifier = Modifier.size(40.dp, 40.dp).background(Color.Black, CircleShape),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Box(modifier = Modifier. size(10.dp, 10.dp).background(Color.Green, CircleShape))
+        Box(modifier = Modifier.fillMaxSize()) {
+            Image(painter = painterResource("Drawable/field.jpg"), "icon")
+            Column {
+                for (j in 1..playingField.height) {
+                    Row {
+                        for (i in 1..playingField.width) {
+                            when {
+                                (snake.bodyOfSnake.first() == Pair(i, j)) -> {
+                                    Box(
+                                        modifier = Modifier.size(40.dp, 40.dp).background(headColor, CircleShape).rotate(rotate),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Image(painter = painterResource("Drawable/head.png"), "icon")
+                                    }
                                 }
-                            }
 
-                            /*(walls.contains(Pair(i, j))) -> {
-                                Box(
-                                    modifier = Modifier.size(40.dp, 40.dp).background(Color.Gray)
-                                )
-                            }
-                            */
-
-                            (snake.bodyOfSnake.contains(Pair(i, j))) -> {
-                                Box(
-                                    modifier = Modifier.size(40.dp, 40.dp).background(Color.Black, CircleShape),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    //Box(modifier = Modifier. size(30.dp, 30.dp).background(Color.Black, CircleShape))
+                                (walls.contains(Pair(i, j))) -> {
+                                    Box(modifier = Modifier.size(40.dp, 40.dp)) {
+                                        Image(painter = painterResource("Drawable/cactus.png"), "icon")
+                                    }
                                 }
-                            }
 
-                            (i == apple.appleX) && (j == apple.appleY) -> {
-                                Box(modifier = Modifier.size(40.dp, 40.dp).background(Color.White)) {
-                                    val img = painterResource("Drawable/apple.png")
-                                    Image(painter = img, "icon")
+                                (snake.bodyOfSnake.contains(Pair(i, j))) -> {
+                                    Box(modifier = Modifier.size(40.dp, 40.dp).background(Color.Black, CircleShape))
                                 }
-                            }
 
-                            (snake.bodyOfSnake.first().first == apple.appleX && snake.bodyOfSnake.first().second == apple.appleY) -> {
-                                snake.bodyOfSnake = snake.bodyOfSnake + snake.bodyOfSnake.map { Pair(it.first, it.second) }.last()
-                                apple = Apple()
-                            }
+                                (apple.coordinates == Pair(i, j)) -> {
+                                    Box(modifier = Modifier.size(40.dp, 40.dp)) {
+                                        Image(painter = painterResource("Drawable/apple.png"), "icon")
+                                    }
+                                }
 
-                            else -> Box(modifier = Modifier.size(40.dp, 40.dp).background(Color.White)) {}
+                                (watermelon.coordinates == Pair(i, j)) -> {
+                                    Box(modifier = Modifier.size(40.dp, 40.dp)) {
+                                        Image(painter = painterResource("Drawable/watermelon.png"), "icon")
+                                    }
+                                }
+
+                                (lemon.coordinates == Pair(i, j)) -> {
+                                    Box(modifier = Modifier.size(40.dp, 40.dp)) {
+                                        Image(painter = painterResource("Drawable/lemon.png"), "icon")
+                                    }
+                                }
+
+                                (grape.coordinates == Pair(i, j)) -> {
+                                    Box(modifier = Modifier.size(40.dp, 40.dp)) {
+                                        Image(painter = painterResource("Drawable/grape.png"), "icon")
+                                    }
+                                }
+
+                                (snake.bodyOfSnake.first() == apple.coordinates) -> {
+                                    snake.bodyOfSnake =
+                                        snake.bodyOfSnake + snake.bodyOfSnake.map { Pair(it.first, it.second) }.last()
+                                    freeCellsForFruit = freeCells.filter { it !in snake.bodyOfSnake }
+                                    apple = Fruit()
+                                }
+
+                                (snake.bodyOfSnake.first() == watermelon.coordinates) -> {
+                                    snake.bodyOfSnake =
+                                        snake.bodyOfSnake + snake.bodyOfSnake.map { Pair(it.first, it.second) }
+                                            .last() + snake.bodyOfSnake.map { Pair(it.first, it.second) }.last()
+                                    freeCellsForFruit = freeCells.filter { it !in snake.bodyOfSnake }
+                                    watermelon = Fruit()
+                                    condition = "норм"
+                                }
+
+                                (snake.bodyOfSnake.first() == lemon.coordinates) -> {
+                                    if (snake.bodyOfSnake.size < 200) {
+                                        lemon = Fruit(name = "lemon")
+                                    } else {
+                                        lemon = Fruit(Pair(100, 100))
+                                        grape = Fruit(name = "grape")
+                                    }
+                                    condition = "быстро"
+                                }
+
+                                (snake.bodyOfSnake.first() == grape.coordinates) -> {
+                                    grape = Fruit(name = "grape")
+                                    condition = "медленно"
+                                }
+
+                                else -> Box(modifier = Modifier.size(40.dp, 40.dp))
+                            }
                         }
                     }
                 }
             }
         }
-        if (!list.contains(snake.bodyOfSnake.first().first) || !list.contains(snake.bodyOfSnake.first().second)) {
+        if (snake.isSnakeSmash()) {
             condition = "игра окончена"
+            Button(
+                onClick = { restart() },
+                modifier = Modifier.fillMaxSize(),
+                colors = ButtonDefaults.buttonColors(backgroundColor = Color(116, 189, 37), contentColor = Color.Black)
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Row(modifier = Modifier.weight(1f)) {}
+                    Row(modifier = Modifier.weight(2f)) { Text("LOSE", fontSize = 100.sp) }
+                    Row(modifier = Modifier.weight(2f)) {
+                        Text(
+                            "Your score: ${snake.bodyOfSnake.size}",
+                            fontSize = 50.sp
+                        )
+                    }
+                    Row(modifier = Modifier.weight(1f)) { Text("Click to try again", fontSize = 25.sp) }
+                    Row(modifier = Modifier.weight(1f)) {}
+                }
+            }
         }
-        if (snake.bodyOfSnake.size == height * width) {
+        if (snake.bodyOfSnake.size >= freeCells.size) {
             Button(onClick = { }, modifier = Modifier.fillMaxSize()) {
                 Text("WIN")
             }
@@ -96,22 +147,40 @@ fun App() {
 
 @ExperimentalComposeUiApi
 fun main() = application {
-        timer(
+    timer(
         daemon = true, period = speed,
     ) {
-        when (move) {
-            "вверх" -> { snake.up() }
-            "вниз" -> { snake.down() }
-            "вправо" -> { snake.right() }
-            "влево" -> { snake.left() }
-            "пауза" -> {  }
-        }
-            when (condition) {
-                "игра окончена" -> {
-                    exitApplication()
-                    println("Игра окончена. Ваш счёт: ${snake.bodyOfSnake.size}")
+        when (condition) {
+            "норм" -> {
+                headColor = Color.White
+                when (move) {
+                    "вверх" -> {
+                        snake.up()
+                    }
+                    "вниз" -> {
+                        snake.down()
+                    }
+                    "вправо" -> {
+                        snake.right()
+                    }
+                    "влево" -> {
+                        snake.left()
+                    }
+                    "пауза" -> {}
                 }
             }
+            "быстро" -> {
+                headColor = Color.Yellow
+                timerFast
+            }
+            "медленно" -> {
+                headColor = Color(255, 0, 255)
+                timerSlow
+            }
+            "игра окончена" -> {
+
+            }
+        }
     }
     Window(
         onKeyEvent = {
@@ -127,6 +196,6 @@ fun main() = application {
             width = 654.dp, height = 675.dp
         )
     ) {
-        App()
+        app()
     }
 }

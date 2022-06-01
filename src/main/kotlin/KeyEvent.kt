@@ -6,19 +6,34 @@ fun keyEvent(it: KeyEvent) {
     if (it.type == KeyEventType.KeyUp) {
         when (it.key) {
             Key.DirectionDown -> {
-                move = "вниз"
+                if (move != "вверх") {
+                    move = "вниз"
+                    rotate = 180f
+                }
             }
             Key.DirectionUp -> {
-                move = "вверх"
+                if (move != "вниз") {
+                    move = "вверх"
+                    rotate = 0f
+                }
             }
             Key.DirectionRight -> {
-                move = "вправо"
+                if (move != "влево") {
+                    move = "вправо"
+                    rotate = 90f
+                }
             }
             Key.DirectionLeft -> {
-                move = "влево"
+                if (move != "вправо") {
+                    move = "влево"
+                    rotate = 270f
+                }
             }
             Key.Spacebar -> {
                 move = "пауза"
+            }
+            Key.A -> {
+                condition = "медленно"
             }
         }
     }
